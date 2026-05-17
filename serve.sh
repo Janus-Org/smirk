@@ -14,4 +14,6 @@
 # HTTPS (e.g. via a tunnel like cloudflared/ngrok).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-exec python3 -m http.server --directory "$HERE/web" 8080
+# Custom server adds COOP/COEP so the page is cross-origin isolated, which
+# is what unlocks SharedArrayBuffer (used by multi-threaded onnxruntime-web).
+exec python3 "$HERE/serve.py"
