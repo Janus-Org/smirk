@@ -152,6 +152,7 @@ async function main() {
     let pending = false;
     let lastTs = 0;
     let frameCount = 0;
+    let inferCount = 0;
     let lastFpsTs = performance.now();
     let lastCamLogTs = 0;
 
@@ -188,6 +189,7 @@ async function main() {
               .run(input)
               .then(({ vertices, cam }) => {
                 const tNow = performance.now();
+                inferCount += 1;
                 const camF = camFilter.filter(cam, tNow, camOut);
                 const vertF = vertFilter.filter(vertices, tNow, vertOut);
                 renderer3d.update(vertF, camF);
@@ -210,8 +212,10 @@ async function main() {
         frameCount++;
         if (ts - lastFpsTs > 1000) {
           const fps = (frameCount * 1000) / (ts - lastFpsTs);
-          setStatus(`running · ${fps.toFixed(1)} fps · ${smirk.getBackend()}`);
+          const ips = (inferCount * 1000) / (ts - lastFpsTs);
+          setStatus(`running · loop ${fps.toFixed(1)} fps · smirk ${ips.toFixed(1)} ips · ${smirk.getBackend()}`);
           frameCount = 0;
+          inferCount = 0;
           lastFpsTs = ts;
         }
       }
